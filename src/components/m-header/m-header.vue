@@ -17,10 +17,13 @@ export default {
 </script>
 <style lang="less" scoped>
 @import "~@/common/less/mixin";
+@import "~@/common/less/variable";
 
 .m-header {
   text-align: center;
   position: relative;
+  font-size: 0;
+  color: @color-theme;
   .icon {
     display: inline-block;
     width: 30px;
@@ -34,6 +37,7 @@ export default {
   .text {
     display: inline-block;
     line-height: 44px;
+    font-size: @font-size-large;
   }
   .user {
     position: absolute;
