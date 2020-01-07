@@ -4,3 +4,8 @@ export function hasClass(el, className) {
 export function addClass(el, className) {
   el.classList.add(className)
 }
+export function getData(el, name) {
+  const prefix = 'data-'
+  name = prefix + name
+  return el.getAttribute(name)
+}
