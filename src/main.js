@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import store from './store'
 import '@/common/less/index.less'
 // 去除 移动端300ms检测双击的 延迟
 import Fastclick from 'fastclick'
@@ -18,5 +19,6 @@ Vue.use(VueLazyload, {
 new Vue({
   el: '#app',
   router,
+  store,
   render: h => h(App)
 })

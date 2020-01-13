@@ -1,13 +1,9 @@
 import jsonp from "@/common/js/jsonp"
+import { commonParams, options } from './config'
 
 export function _getSingerList() {
   const url = 'https://c.y.qq.com/v8/fcg-bin/v8.fcg'
-  const params = {
-    g_tk: 799023101,
-    inCharset: 'utf-8',
-    outCharset: 'utf-8',
-    notice: 0,
-    format: 'jsonp',
+  const params = Object.assign({}, commonParams, {
     channel: 'singer',
     page: 'list',
     key: 'all_all_all',
@@ -16,9 +12,21 @@ export function _getSingerList() {
     hostUin: 0,
     needNewCode: 0,
     platform: 'yqq'
-  }
-  const options = {
-    param: 'jsonpCallback'
-  }
+  })
+  return jsonp(url, params, options)
+}
+
+export function _getSingerDetail(singerId) {
+  const url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_singer_track_cp.fcg'
+  const params = Object.assign({}, commonParams, {
+    hostUin: 0,
+    needNewCode: 0,
+    platform: 'yqq',
+    order: 'listen',
+    begin: 0,
+    num: 80,
+    songstatus: 1,
+    singermid: singerId
+  })
   return jsonp(url, params, options)
 }
