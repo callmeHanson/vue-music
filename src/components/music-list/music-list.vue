@@ -5,7 +5,7 @@
     </div>
     <h1 class="title">{{title}}</h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
-      <div ref="playBtn" class="play-wrapper" v-show="songs.length > 0">
+      <div ref="playBtn" @click="random" class="play-wrapper" v-show="songs.length > 0">
         <div class="play-btn">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
@@ -23,7 +23,7 @@
       ref="list"
     >
       <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list @select="selectItem" :songs="songs"></song-list>
       </div>
       <div v-show="!songs.length" class="loading-container">
         <loading></loading>
@@ -36,6 +36,7 @@ import SongList from "base/song-list/song-list";
 import Scroll from "base/scroll/scroll";
 import { prefixStyle } from "common/js/dom";
 import Loading from "base/loading/loading";
+import { mapActions } from "vuex";
 
 const RESERVED_HEIGHT = 40;
 const transform = prefixStyle("transform");
@@ -125,7 +126,20 @@ export default {
     scroll(pos) {
       let { y } = pos;
       this.scrollY = y;
-    }
+    },
+
+    selectItem(item, $index) {
+      this.selectPlay({
+        list: this.songs,
+        index: $index
+      });
+    },
+
+    random() {
+      this.randomPlay({ list: this.songs });
+    },
+
+    ...mapActions(["selectPlay", "randomPlay"])
   },
 
   components: { SongList, Scroll, Loading }
@@ -227,7 +241,7 @@ export default {
       position: absolute;
       width: 100%;
       top: 50%;
-      transform: translate3d(0, -50%, 0)
+      transform: translate3d(0, -50%, 0);
     }
   }
 }
