@@ -11,7 +11,12 @@
       <li class="list-group" v-for="(group,$index) in data" :key="$index" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li @click="selectItem(item)" class="list-group-item" v-for="item in group.items" :key="item.id">
+          <li
+            @click="selectItem(item)"
+            class="list-group-item"
+            v-for="item in group.items"
+            :key="item.id"
+          >
             <img v-lazy="item.avatar" alt class="avatar" />
             <span class="name">{{item.name}}</span>
           </li>
@@ -148,7 +153,7 @@ export default {
     },
 
     selectItem(item) {
-      this.$emit('select', item)
+      this.$emit("select", item);
     },
 
     _scrollTo(index) {
@@ -174,6 +179,10 @@ export default {
         height += item.clientHeight;
         this.listHeight.push(height);
       }
+    },
+
+    _refresh() {
+      this.$refs["listview"].refresh();
     }
   }
 };

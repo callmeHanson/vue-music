@@ -11,7 +11,13 @@ export default new Router({
     },
     {
       path: '/recommend',
-      component: () => import('@/components/recommend/recommend')
+      component: () => import('@/components/recommend/recommend'),
+      children: [
+        {
+          path: ':id',
+          component: () => import('@/components/disc/disc')
+        }
+      ]
     },
     {
       path: '/singer',
@@ -25,7 +31,13 @@ export default new Router({
     },
     {
       path: '/rank',
-      component: () => import('@/components/rank/rank')
+      component: () => import('@/components/rank/rank'),
+      children: [
+        {
+          path: ':id',
+          component: () => import('@/components/top-list/top-list')
+        }
+      ]
     },
     {
       path: '/search',

@@ -36,7 +36,7 @@ export default {
     > span {
       padding-bottom: 5px;
       border-bottom: 2px solid transparent;
-      color: @color-text;
+      color: @color-text-l;
     }
     &.router-link-active {
       span {

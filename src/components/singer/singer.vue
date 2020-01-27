@@ -1,6 +1,6 @@
 <template>
-  <div class="singer">
-    <listview :data="singerList" @select="selectSinger"></listview>
+  <div class="singer" ref="singer">
+    <listview :data="singerList" @select="selectSinger" ref="listview"></listview>
     <router-view></router-view>
   </div>
 </template>
@@ -10,11 +10,13 @@ import Singer from "common/js/singer";
 import Listview from "base/listview/listview";
 import { mapMutations } from "vuex";
 import * as types from "@/store/mutation-types";
+import { playlistMixin } from "common/js/mixin";
 
 const HOT_LEN = 10;
 const HOT_NAME = "热门";
 export default {
   name: "singer",
+  mixins: [playlistMixin],
   components: { Listview },
   data() {
     return {
@@ -26,7 +28,7 @@ export default {
   },
   methods: {
     selectSinger(singer) {
-      this.setSinger(singer)
+      this.setSinger(singer);
       this.$router.push({ path: `/singer/${singer.id}` });
     },
 
@@ -38,6 +40,7 @@ export default {
         }
       });
     },
+
     normalize(list = []) {
       let map = {
         hot: {
@@ -55,9 +58,7 @@ export default {
             items: []
           };
         }
-        map[item.Findex].items.push(
-          new Singer(item.Fsinger_mid, item.Fsinger_name)
-        );
+        map[item.Findex].items.push(new Singer(item.Fsinger_mid, item.Fsinger_name));
       });
       // 筛选出 热门 和a-zA-Z
       let hot = [];
@@ -75,6 +76,13 @@ export default {
       });
       return hot.concat(res);
     },
+
+    handlePlaylist(playlist) {
+      const bottom = playlist.length > 0 ? "60px" : "";
+      this.$refs.singer.style.bottom = bottom;
+      this.$refs["listview"]._refresh();
+    },
+
     ...mapMutations({
       setSinger: types.SET_SINGER
     })

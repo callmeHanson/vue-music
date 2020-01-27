@@ -33,12 +33,7 @@ export default {
   },
   watch: {
     percent(percent, old) {
-      if (percent >= 0 && !this.touch.initiated) {
-        const barWidth = this.$refs["progress-bar"].clientWidth - progressBtnWidth;
-        const offsetWidth = barWidth * this.percent;
-
-        this._offset(offsetWidth);
-      }
+      this.setProgressOffset(percent);
     }
   },
 
@@ -71,8 +66,20 @@ export default {
     },
 
     progressClick(e) {
-      this._offset(e.offsetX);
+      const rect = this.$refs["progress"].getBoundingClientRect();
+      const offsetWidth = e.pageX - rect.left;
+
+      this._offset(offsetWidth);
       this._triggerPercent();
+    },
+
+    setProgressOffset(percent) {
+      if (percent >= 0 && !this.touch.initiated) {
+        const barWidth = this.$refs["progress-bar"].clientWidth - progressBtnWidth;
+        const offsetWidth = barWidth * percent;
+
+        this._offset(offsetWidth);
+      }
     },
 
     _triggerPercent() {
