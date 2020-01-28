@@ -83,6 +83,29 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           res.json(ret)
         }).catch(e => console.log(e))
       })
+      app.get('/api/search', (req, res) => {
+        const url = 'https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp'
+        axios.get(url, {
+          headers: {
+            referer: "https://c.y.qq.com/",
+            host: 'c.y.qq.com'
+          },
+          params: req.query
+        }).then(resp => {
+          let ret = resp.data
+          // 1. format: json
+          if (typeof ret === "string") {
+            // 包含一个分组
+            let reg = /^\w+\((.+)\)$/
+            let matches = ret.match(reg)
+            if (matches) {
+              ret = JSON.parse(matches[1])
+            }
+          }
+          // 2. format: jsonp
+          res.json(ret)
+        }).catch(e => console.log(e))
+      })
       app.post('/api/getPurlUrl', bodyParser.json(), function (req, res) {
         const url = 'https://u.y.qq.com/cgi-bin/musicu.fcg'
         axios.post(url, req.body, {

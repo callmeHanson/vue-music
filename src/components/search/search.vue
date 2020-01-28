@@ -1,9 +1,9 @@
 <template>
   <div class="search">
     <div class="search-box-wrapper">
-      <search-box ref="searchBox"></search-box>
+      <search-box ref="searchBox" @query="handleQuery"></search-box>
     </div>
-    <div class="shortcut-wrapper">
+    <div class="shortcut-wrapper" v-show="!query">
       <div class="shortcut">
         <div class="hotKey">
           <h1 class="title">热门搜索</h1>
@@ -15,27 +15,37 @@
         </div>
       </div>
     </div>
+    <div class="suggest-wrapper" v-show="query">
+      <suggest ref="suggest" :query="query" :showSinger="showSinger"></suggest>
+    </div>
   </div>
 </template>
 <script>
 import SearchBox from "base/search-box/search-box";
 import { getHotKey } from "api/search";
 import { ERR_OK } from "api/config";
+import Suggest from "components/suggest/suggest";
 
 export default {
   name: "search",
-  components: { SearchBox },
+  components: { SearchBox, Suggest },
   data() {
     return {
-      hotKey: []
+      hotKey: [],
+      query: ""
     };
   },
   created() {
+    this.showSinger = true
     this._getHotKey();
   },
   methods: {
     addQuery(query) {
-      this.$refs["searchBox"].setQuery(query)
+      this.$refs["searchBox"].setQuery(query);
+      this.query = query
+    },
+    handleQuery(query) {
+      this.query = query;
     },
     _getHotKey() {
       getHotKey().then(res => {
@@ -79,6 +89,13 @@ export default {
         }
       }
     }
+  }
+  .suggest-wrapper {
+    position: fixed;
+    top: 178px;
+    bottom: 0;
+    width: 100%;
+    background: @color-background;
   }
 }
 </style>

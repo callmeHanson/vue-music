@@ -24,6 +24,10 @@ export default {
     listenScroll: {
       type: Boolean,
       default: false
+    },
+    pullup: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -57,6 +61,15 @@ export default {
         const me = this;
         this.scroll.on("scroll", pos => {
           me.$emit("scroll", pos);
+        });
+      }
+
+      if (this.pullup) {
+        const me = this;
+        this.scroll.on("scrollEnd", pos => {
+          if (me.scroll.y <= me.scroll.maxScrollY + 50) {
+            me.$emit("scrollToEnd", pos);
+          }
         });
       }
     },
