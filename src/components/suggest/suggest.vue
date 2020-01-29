@@ -4,10 +4,20 @@
     ref="suggest"
     :data="suggestList"
     :pullup="pullup"
+    :pulldown="pulldown"
+    :beforeScroll="beforeScroll"
     @scrollToEnd="searchMore"
+    @scrollToTop="reSearch"
+    @beforeScroll="listenScroll"
   >
     <ul class="suggest-list">
-      <li class="suggest-item" v-for="(item,index) in suggestList" :key="index">
+      <loading v-show="loading" title></loading>
+      <li
+        @click="selectItem(item)"
+        class="suggest-item"
+        v-for="(item,index) in suggestList"
+        :key="index"
+      >
         <div class="icon">
           <i :class="getIconCls(item)"></i>
         </div>
@@ -29,6 +39,9 @@ import Scroll from "base/scroll/scroll";
 import { createSong } from "common/js/song";
 import Loading from "base/loading/loading";
 import NoResult from "base/no-result/no-result";
+import { mapMutations, mapActions } from "vuex";
+import * as types from "store/mutation-types";
+import Singer from "common/js/singer";
 
 const TYPE_SINGER = 2;
 const PER_PAGE = 20;
@@ -48,7 +61,8 @@ export default {
   },
   data() {
     return {
-      suggestList: []
+      suggestList: [],
+      loading: false
     };
   },
   watch: {
@@ -60,6 +74,8 @@ export default {
     this.hasMore = true;
     this.page = 1;
     this.pullup = true;
+    this.pulldown = true;
+    this.beforeScroll = true;
   },
   methods: {
     getIconCls(item) {
@@ -86,6 +102,36 @@ export default {
           this._checkMore(res.data);
         }
       });
+    },
+    selectItem(item) {
+      if (item.type === TYPE_SINGER) {
+        const singer = new Singer({
+          id: item.singermid,
+          name: item.singername
+        });
+        this.$router.push({
+          path: `/search/${singer.id}`
+        });
+        this.setSinger(singer);
+      } else {
+        this.insertSong(item);
+      }
+      this.$emit("select", item)
+    },
+    reSearch(pos) {
+      this.page = 1;
+      this.loading = true;
+      this.$refs["suggest"].scrollTo(0, 0);
+      search(this.query, this.page, this.showSinger).then(res => {
+        if (res.code === ERR_OK) {
+          this.loading = false;
+          this.suggestList = this._getResult(res.data);
+          this._checkMore(res.data);
+        }
+      });
+    },
+    listenScroll(pos) {
+      this.$emit("listenScroll", pos)
     },
     _search() {
       this.page = 1;
@@ -120,7 +166,15 @@ export default {
       if (song.list.length === 0 || song.curnum + (song.curpage - 1) * PER_PAGE >= song.totalnum) {
         this.hasMore = false;
       }
-    }
+    },
+    _refresh() {
+      this.$refs["suggest"].refresh();
+    },
+
+    ...mapMutations({
+      setSinger: types.SET_SINGER
+    }),
+    ...mapActions(["insertSong"])
   }
 };
 </script>

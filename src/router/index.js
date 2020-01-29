@@ -41,7 +41,13 @@ export default new Router({
     },
     {
       path: '/search',
-      component: () => import('@/components/search/search')
+      component: () => import('@/components/search/search'),
+      children: [
+        {
+          path: ':id',
+          component: () => import('@/components/singer-detail/singer-detail')
+        }
+      ]
     }
   ]
 });

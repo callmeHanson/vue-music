@@ -3,7 +3,7 @@
     <div class="search-box-wrapper">
       <search-box ref="searchBox" @query="handleQuery"></search-box>
     </div>
-    <div class="shortcut-wrapper" v-show="!query">
+    <div ref="shortcutWrapper" class="shortcut-wrapper" v-show="!query">
       <div class="shortcut">
         <div class="hotKey">
           <h1 class="title">热门搜索</h1>
@@ -15,9 +15,16 @@
         </div>
       </div>
     </div>
-    <div class="suggest-wrapper" v-show="query">
-      <suggest ref="suggest" :query="query" :showSinger="showSinger"></suggest>
+    <div ref="suggestWrapper" class="suggest-wrapper" v-show="query">
+      <suggest
+        ref="suggest"
+        :query="query"
+        :showSinger="showSinger"
+        @listenScroll="blurInput"
+        @select="saveSearch"
+      ></suggest>
     </div>
+    <router-view></router-view>
   </div>
 </template>
 <script>
@@ -25,9 +32,12 @@ import SearchBox from "base/search-box/search-box";
 import { getHotKey } from "api/search";
 import { ERR_OK } from "api/config";
 import Suggest from "components/suggest/suggest";
+import { playlistMixin } from "common/js/mixin";
+import { mapActions } from "vuex";
 
 export default {
   name: "search",
+  mixins: [playlistMixin],
   components: { SearchBox, Suggest },
   data() {
     return {
@@ -36,16 +46,31 @@ export default {
     };
   },
   created() {
-    this.showSinger = true
+    this.showSinger = true;
     this._getHotKey();
   },
   methods: {
     addQuery(query) {
       this.$refs["searchBox"].setQuery(query);
-      this.query = query
+      this.query = query;
     },
     handleQuery(query) {
       this.query = query;
+    },
+    handlePlaylist(playlist) {
+      const bottom = playlist.length > 0 ? "60px" : "";
+      if (this.query) {
+        this.$refs["suggestWrapper"].style.bottom = bottom;
+        this.$refs["suggest"]._refresh();
+      } else {
+        this.$refs["shortcutWrapper"].style.bottom = bottom;
+      }
+    },
+    blurInput(pos) {
+      this.$refs["searchBox"].blur();
+    },
+    saveSearch(item) {
+      this.saveSearchHistory(this.query);
     },
     _getHotKey() {
       getHotKey().then(res => {
@@ -53,7 +78,9 @@ export default {
           this.hotKey = res.data.hotkey.slice(0, 10);
         }
       });
-    }
+    },
+
+    ...mapActions(["saveSearchHistory"])
   }
 };
 </script>

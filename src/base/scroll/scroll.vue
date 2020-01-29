@@ -28,6 +28,14 @@ export default {
     pullup: {
       type: Boolean,
       default: false
+    },
+    pulldown: {
+      type: Boolean,
+      default: false
+    },
+    beforeScroll: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -70,6 +78,21 @@ export default {
           if (me.scroll.y <= me.scroll.maxScrollY + 50) {
             me.$emit("scrollToEnd", pos);
           }
+        });
+      }
+
+      if (this.pulldown) {
+        const me = this;
+        this.scroll.on("scrollEnd", pos => {
+          if (me.scroll.y >= 0) {
+            me.$emit("scrollToTop", pos);
+          }
+        });
+      }
+
+      if (this.beforeScroll) {
+        this.scroll.on("beforeScrollStart", pos => {
+          this.$emit("beforeScroll", pos);
         });
       }
     },

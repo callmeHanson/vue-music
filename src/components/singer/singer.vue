@@ -50,7 +50,7 @@ export default {
       };
       list.forEach((item, index) => {
         if (index < HOT_LEN) {
-          map.hot.items.push(new Singer(item.Fsinger_mid, item.Fsinger_name));
+          map.hot.items.push(new Singer({ id: item.Fsinger_mid, name: item.Fsinger_name }));
         }
         if (!map.hasOwnProperty(item.Findex)) {
           map[item.Findex] = {
@@ -58,7 +58,7 @@ export default {
             items: []
           };
         }
-        map[item.Findex].items.push(new Singer(item.Fsinger_mid, item.Fsinger_name));
+        map[item.Findex].items.push(new Singer({ id: item.Fsinger_mid, singer: item.Fsinger_name }));
       });
       // 筛选出 热门 和a-zA-Z
       let hot = [];
