@@ -1,7 +1,7 @@
 import * as types from './mutation-types'
 import { playMode } from 'common/js/config'
 import { shuffle } from 'common/js/util'
-import { saveSearch } from "common/js/cache"
+import { saveSearch, deleteSearch, clearSearch, savePlay } from "common/js/cache"
 
 function findIndex(list, song) {
   return list.findIndex(item => item.id === song.id)
@@ -75,4 +75,48 @@ export function insertSong({ commit, state }, song) {
 
 export function saveSearchHistory({ commit }, query) {
   commit(types.SET_SEARCH_HISTORY, saveSearch(query))
+}
+
+export function deleteSearchHistory({ commit }, query) {
+  commit(types.SET_SEARCH_HISTORY, deleteSearch(query))
+}
+
+export function clearSearchHistory({ commit }) {
+  commit(types.SET_SEARCH_HISTORY, clearSearch())
+}
+
+export function deleteSong({ commit, state }, song) {
+  let playList = state.playList.slice(0)
+  let sequenceList = state.sequenceList.slice(0)
+  let currentIndex = state.currentIndex
+
+  const fpIndex = playList.findIndex(item => item.id === song.id)
+  playList.splice(fpIndex, 1)
+
+  const fsIndex = sequenceList.findIndex(item => item.id === song.id)
+  sequenceList.splice(fsIndex, 1)
+
+  // 当前播放列表的索引大于删除歌曲索引 或者 当前播放的是最后一首歌，此时播放索引必须减一
+  if (currentIndex > fpIndex || currentIndex === playList.length) {
+    currentIndex--;
+  }
+
+  commit(types.SET_PLAYLIST, playList)
+  commit(types.SET_SEQUENCE_LIST, sequenceList)
+  commit(types.SET_CURRENT_INDEX, currentIndex)
+
+  // 删除掉最后一首的时候，需要把状态重置
+  const playingState = playList.length > 0
+  commit(types.SET_PLAYING_STATE, playingState)
+}
+
+export function deleteSongList({ commit }) {
+  commit(types.SET_SEQUENCE_LIST, [])
+  commit(types.SET_PLAYLIST, [])
+  commit(types.SET_PLAYING_STATE, false)
+  commit(types.SET_CURRENT_INDEX, -1)
+}
+
+export function savePlayHistory({ commit }, song) {
+  commit(types.SET_PLAY_HISTORY, savePlay(song))
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="player" v-if="playList.length">
+  <div class="player" v-show="playList.length">
     <transition
       name="normal"
       @enter="enter"
@@ -107,11 +107,13 @@
             <i @click.stop="togglePlaying" class="icon-mini" :class="miniPlay"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click.stop="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+
+    <playlist ref="playlist"></playlist>
 
     <audio
       ref="audio"
@@ -125,20 +127,22 @@
 </template>
 <script>
 import * as types from "store/mutation-types";
-import { mapGetters, mapMutations } from "vuex";
+import { mapGetters, mapMutations, mapActions } from "vuex";
 import animations from "create-keyframe-animation";
 import { prefixStyle } from "common/js/dom";
 import ProgressBar from "base/progress-bar/progress-bar";
 import ProgressCircle from "base/progress-circle/progress-circle";
 import { playMode } from "common/js/config";
-import { shuffle } from "common/js/util";
 import Lyric from "lyric-parser";
 import Scroll from "base/scroll/scroll";
+import Playlist from "components/playlist/playlist";
+import { playerMixin } from "common/js/mixin";
 
 const transform = prefixStyle("transform");
 const transitionDuration = prefixStyle("transitionDuration");
 
 export default {
+  mixins: [playerMixin],
   name: "player",
   data() {
     return {
@@ -166,29 +170,13 @@ export default {
     percent() {
       return this.currentTime / this.currentSong.duration;
     },
-    iconMode() {
-      switch (this.mode) {
-        case playMode.sequence:
-          return "icon-sequence";
-        case playMode.loop:
-          return "icon-loop";
-        case playMode.random:
-          return "icon-random";
-      }
-    },
-    ...mapGetters([
-      "playing",
-      "mode",
-      "fullScreen",
-      "sequenceList",
-      "playList",
-      "currentIndex",
-      "currentSong"
-    ])
+
+    ...mapGetters(["playing", "fullScreen", "playList", "currentIndex", "currentSong"])
   },
 
   watch: {
     currentSong(newSong, oldSong) {
+      if (!newSong.id) return;
       if (newSong.id === oldSong.id) return;
 
       this.songReady = false;
@@ -331,6 +319,7 @@ export default {
 
     ready() {
       this.songReady = true;
+      this.savePlayHistory(this.currentSong);
     },
 
     error() {
@@ -374,25 +363,6 @@ export default {
       if (this.currentLyric) {
         this.currentLyric.seek(currentTime * 1000);
       }
-    },
-
-    changeMode() {
-      const mode = (this.mode + 1) % 3;
-      this.setMode(mode);
-      let list = [];
-      if (this.mode === playMode.random) {
-        list = shuffle(this.sequenceList);
-      } else {
-        list = this.sequenceList;
-      }
-
-      this.resetCurrentIndex(list);
-      this.setPlayList(list);
-    },
-
-    resetCurrentIndex(list) {
-      const idx = list.findIndex(item => item.id === this.currentSong.id);
-      this.setCurrentIndex(idx);
     },
 
     getLyric() {
@@ -477,6 +447,10 @@ export default {
       this.$refs["middleL"].style[transitionDuration] = `${time}ms`;
     },
 
+    showPlaylist() {
+      this.$refs["playlist"].show();
+    },
+
     _pad(num, n = 2) {
       let len = num.toString().length;
       while (len < n) {
@@ -511,13 +485,11 @@ export default {
 
     ...mapMutations({
       setFullScreen: types.SET_FULLSCREEN,
-      setPlayingState: types.SET_PLAYING_STATE,
-      setCurrentIndex: types.SET_CURRENT_INDEX,
-      setMode: types.SET_MODE,
-      setPlayList: types.SET_PLAYLIST
-    })
+      setPlayingState: types.SET_PLAYING_STATE
+    }),
+    ...mapActions(["savePlayHistory"])
   },
-  components: { ProgressBar, ProgressCircle, Scroll }
+  components: { ProgressBar, ProgressCircle, Scroll, Playlist }
 };
 </script>
 <style lang="less" scoped>

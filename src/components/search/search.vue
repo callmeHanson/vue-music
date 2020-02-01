@@ -1,19 +1,30 @@
 <template>
   <div class="search">
     <div class="search-box-wrapper">
-      <search-box ref="searchBox" @query="handleQuery"></search-box>
+      <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
     <div ref="shortcutWrapper" class="shortcut-wrapper" v-show="!query">
-      <div class="shortcut">
-        <div class="hotKey">
-          <h1 class="title">热门搜索</h1>
-          <ul>
-            <li @click="addQuery(item.k)" class="item" v-for="item in hotKey" :key="item.n">
-              <span v-text="item.k"></span>
-            </li>
-          </ul>
+      <scroll :refreshDelay="refreshDelay" ref="shortcut" :data="shortcut" class="shortcut">
+        <div>
+          <div class="hotKey">
+            <h1 class="title">热门搜索</h1>
+            <ul>
+              <li @click="addQuery(item.k)" class="item" v-for="item in hotKey" :key="item.n">
+                <span v-text="item.k"></span>
+              </li>
+            </ul>
+          </div>
+          <div class="search-history" v-show="searchHistory.length">
+            <h1 class="title">
+              <span class="text">搜索历史</span>
+              <span class="clear" @click="showConfirm">
+                <i class="icon-clear"></i>
+              </span>
+            </h1>
+            <search-list :searches="searchHistory" @select="addQuery" @delete="deleteSearchHistory"></search-list>
+          </div>
         </div>
-      </div>
+      </scroll>
     </div>
     <div ref="suggestWrapper" class="suggest-wrapper" v-show="query">
       <suggest
@@ -24,6 +35,13 @@
         @select="saveSearch"
       ></suggest>
     </div>
+    <confirm
+      ref="confirm"
+      :text="text"
+      :confirmBtnText="confirmBtnText"
+      :cancelBtnText="cancelBtnText"
+      @confirm="clearSearchHistory"
+    ></confirm>
     <router-view></router-view>
   </div>
 </template>
@@ -32,21 +50,41 @@ import SearchBox from "base/search-box/search-box";
 import { getHotKey } from "api/search";
 import { ERR_OK } from "api/config";
 import Suggest from "components/suggest/suggest";
-import { playlistMixin } from "common/js/mixin";
-import { mapActions } from "vuex";
+import { playlistMixin, searchMixin } from "common/js/mixin";
+import { mapGetters, mapActions } from "vuex";
+import SearchList from "base/search-list/search-list";
+import Confirm from "base/confirm/confirm";
+import Scroll from "base/scroll/scroll";
 
 export default {
+  mixins: [playlistMixin, searchMixin],
   name: "search",
-  mixins: [playlistMixin],
-  components: { SearchBox, Suggest },
+  components: { SearchBox, Suggest, SearchList, Confirm, Scroll },
   data() {
     return {
-      hotKey: [],
-      query: ""
+      hotKey: []
     };
+  },
+  computed: {
+    shortcut() {
+      return this.hotKey.concat(this.searchHistory);
+    },
+    ...mapGetters(["searchHistory"])
+  },
+  watch: {
+    query(newQuery) {
+      if (!newQuery) {
+        setTimeout(() => {
+          this.$refs["shortcut"].refresh();
+        }, 20);
+      }
+    }
   },
   created() {
     this.showSinger = true;
+    this.text = "是否清空所有搜索历史";
+    this.confirmBtnText = "清空";
+    this.cancelBtnText = "取消";
     this._getHotKey();
   },
   methods: {
@@ -54,23 +92,19 @@ export default {
       this.$refs["searchBox"].setQuery(query);
       this.query = query;
     },
-    handleQuery(query) {
-      this.query = query;
-    },
     handlePlaylist(playlist) {
       const bottom = playlist.length > 0 ? "60px" : "";
-      if (this.query) {
-        this.$refs["suggestWrapper"].style.bottom = bottom;
-        this.$refs["suggest"]._refresh();
-      } else {
-        this.$refs["shortcutWrapper"].style.bottom = bottom;
-      }
+      this.$refs["suggestWrapper"].style.bottom = bottom;
+      this.$refs["suggest"]._refresh();
+
+      this.$refs["shortcutWrapper"].style.bottom = bottom;
+      this.$refs["shortcut"].refresh();
     },
-    blurInput(pos) {
-      this.$refs["searchBox"].blur();
+    deleteAll() {
+      this.clearSearchHistory();
     },
-    saveSearch(item) {
-      this.saveSearchHistory(this.query);
+    showConfirm() {
+      this.$refs["confirm"].show();
     },
     _getHotKey() {
       getHotKey().then(res => {
@@ -80,12 +114,13 @@ export default {
       });
     },
 
-    ...mapActions(["saveSearchHistory"])
+    ...mapActions(["saveSearchHistory", "deleteSearchHistory", "clearSearchHistory"])
   }
 };
 </script>
 <style lang="less" scoped>
 @import "~common/less/variable";
+@import "~common/less/mixin";
 
 .search {
   .search-box-wrapper {
@@ -113,6 +148,27 @@ export default {
           color: @color-text-d;
           border-radius: 6px;
           padding: 5px 10px;
+        }
+      }
+      .search-history {
+        margin: 0 20px;
+        .title {
+          display: flex;
+          align-items: center;
+          height: 40px;
+          .text {
+            flex: 1;
+            color: @color-text-l;
+            font-size: @font-size-medium;
+          }
+          .clear {
+            font-size: 0;
+            .extend-click();
+            [class^="icon-"] {
+              color: @color-text-d;
+              font-size: @font-size-medium;
+            }
+          }
         }
       }
     }

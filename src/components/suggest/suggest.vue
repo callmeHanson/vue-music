@@ -4,10 +4,8 @@
     ref="suggest"
     :data="suggestList"
     :pullup="pullup"
-    :pulldown="pulldown"
     :beforeScroll="beforeScroll"
     @scrollToEnd="searchMore"
-    @scrollToTop="reSearch"
     @beforeScroll="listenScroll"
   >
     <ul class="suggest-list">
@@ -36,7 +34,7 @@
 import { search } from "api/search";
 import { ERR_OK } from "api/config";
 import Scroll from "base/scroll/scroll";
-import { createSong } from "common/js/song";
+import { createSong, processSongsUrl } from "common/js/song";
 import Loading from "base/loading/loading";
 import NoResult from "base/no-result/no-result";
 import { mapMutations, mapActions } from "vuex";
@@ -116,7 +114,7 @@ export default {
       } else {
         this.insertSong(item);
       }
-      this.$emit("select", item)
+      this.$emit("select", item);
     },
     reSearch(pos) {
       this.page = 1;
@@ -131,7 +129,7 @@ export default {
       });
     },
     listenScroll(pos) {
-      this.$emit("listenScroll", pos)
+      this.$emit("listenScroll", pos);
     },
     _search() {
       this.page = 1;
@@ -139,7 +137,9 @@ export default {
       this.$refs["suggest"].scrollTo(0, 0);
       search(this.query, this.page, this.showSinger).then(res => {
         if (res.code === ERR_OK) {
-          this.suggestList = this._getResult(res.data);
+          this._getResult(res.data).then(songs => {
+            this.suggestList = songs;
+          });
           this._checkMore(res.data);
         }
       });
@@ -150,9 +150,10 @@ export default {
       if (zhida && zhida.singerid && this.page === 1) {
         ret.push(zhida);
       }
-      const songs = this._normalizeSong(song.list);
-      ret = ret.concat(songs);
-      return ret;
+      return processSongsUrl(this._normalizeSong(song.list)).then(songs => {
+        ret = ret.concat(songs);
+        return ret;
+      });
     },
     _normalizeSong(list) {
       let ret = [];
