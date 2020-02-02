@@ -6,6 +6,10 @@ import '@/common/less/index.less'
 // 去除 移动端300ms检测双击的 延迟
 import Fastclick from 'fastclick'
 import VueLazyload from 'vue-lazyload'
+/* eslint-disable no-unused-vars */
+import Vconsole from "vconsole"
+
+console.log("test")
 
 Vue.config.productionTip = false
 
