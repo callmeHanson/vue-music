@@ -14,6 +14,7 @@ import { playlistMixin } from "common/js/mixin";
 
 const HOT_LEN = 10;
 const HOT_NAME = "热门";
+
 export default {
   name: "singer",
   mixins: [playlistMixin],
@@ -58,7 +59,7 @@ export default {
             items: []
           };
         }
-        map[item.Findex].items.push(new Singer({ id: item.Fsinger_mid, singer: item.Fsinger_name }));
+        map[item.Findex].items.push(new Singer({ id: item.Fsinger_mid, name: item.Fsinger_name }));
       });
       // 筛选出 热门 和a-zA-Z
       let hot = [];
