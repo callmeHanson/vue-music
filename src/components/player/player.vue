@@ -79,7 +79,7 @@
               <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-left">
-              <i class="icon-not-favorite"></i>
+              <i @click="toggleFavorite(currentSong)" :class="getFavoriteIcon(currentSong)"></i>
             </div>
           </div>
         </div>
@@ -171,7 +171,7 @@ export default {
       return this.currentTime / this.currentSong.duration;
     },
 
-    ...mapGetters(["playing", "fullScreen", "playList", "currentIndex", "currentSong"])
+    ...mapGetters(["playing", "fullScreen", "playList", "currentIndex"])
   },
 
   watch: {
@@ -672,6 +672,9 @@ export default {
           font-size: 30px;
           .icon-play {
             font-size: 40px;
+          }
+          .icon-favorite {
+            color: @color-sub-theme;
           }
           &.i-left {
             text-align: left;
