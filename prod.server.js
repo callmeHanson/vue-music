@@ -1,5 +1,4 @@
 var express = require("express")
-var config = require("./config/index")
 var axios = require('axios')
 const bodyParser = require('body-parser')
 
@@ -106,7 +105,7 @@ app.use('/api', apiRoutes)
 
 app.use(express.static('./dist'))
 
-var port = 9000
+var port = 80
 
 app.listen(port, function (err) {
   if (err) {
