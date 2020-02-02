@@ -106,7 +106,7 @@ app.use('/api', apiRoutes)
 
 app.use(express.static('./dist'))
 
-var port = process.env.port || config.build.port
+var port = 9000
 
 app.listen(port, function (err) {
   if (err) {
