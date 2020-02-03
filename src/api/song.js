@@ -23,7 +23,7 @@ export function getLyric(mid) {
 }
 
 export function getSongsUrl(songs) {
-  const url = baseUrl+'api/getPurlUrl'
+  const url = baseUrl + 'api/getPurlUrl'
 
   let mids = []
   let types = []
