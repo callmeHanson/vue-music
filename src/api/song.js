@@ -1,13 +1,13 @@
 import { commonParams } from './config'
 import { getUid } from 'common/js/uid'
 import axios from 'axios'
-import { ERR_OK } from 'api/config'
+import { ERR_OK, baseUrl } from 'api/config'
 
 // const debug = process.env.NODE_ENV !== 'production'
 const debug = true
 
 export function getLyric(mid) {
-  const url = '/api/lyric'
+  const url = baseUrl + 'api/lyric'
   const data = Object.assign({}, commonParams, {
     songmid: mid,
     pcachetime: +new Date(),
@@ -23,7 +23,7 @@ export function getLyric(mid) {
 }
 
 export function getSongsUrl(songs) {
-  const url = debug ? '/api/getPurlUrl' : 'http://ustbhuangyi.com/music/api/getPurlUrl'
+  const url = baseUrl+'api/getPurlUrl'
 
   let mids = []
   let types = []

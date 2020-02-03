@@ -1,5 +1,5 @@
 import jsonp from "@/common/js/jsonp"
-import { commonParams, options } from './config'
+import { commonParams, options,baseUrl } from './config'
 import axios from "axios";
 
 export function getHotKey() {
@@ -13,7 +13,7 @@ export function getHotKey() {
 }
 
 export function search(query, page, zhida) {
-  const url = "/api/search"
+  const url = baseUrl + "api/search"
 
   const params = Object.assign({}, commonParams, {
     w: query,

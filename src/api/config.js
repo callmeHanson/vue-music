@@ -12,3 +12,10 @@ export const options = {
 }
 
 export const ERR_OK = 0
+
+const urlMap = {
+  development: "/",
+  production: "http://www.bosaidong.work/music/"
+}
+
+export const baseUrl = urlMap[process.env.NODE_ENV]

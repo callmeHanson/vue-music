@@ -1,6 +1,6 @@
 import jsonp from "@/common/js/jsonp"
 import axios from 'axios'
-import { commonParams } from './config'
+import { commonParams,baseUrl } from './config'
 
 export function _getRecommend() {
   const url = 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg'
@@ -21,7 +21,7 @@ export function _getRecommend() {
 }
 
 export function _getDictList() {
-  return axios.get('/api/getDictList', {
+  return axios.get(baseUrl+'api/getDictList', {
     params: {
       g_tk: 799023101,
       inCharset: 'utf-8',
@@ -43,7 +43,7 @@ export function _getDictList() {
 }
 
 export function _getSongList(disstid) {
-  const url = '/api/getCdInfo'
+  const url = baseUrl + 'api/getCdInfo'
   const params = Object.assign({}, commonParams, {
     disstid,
     type: 1,
