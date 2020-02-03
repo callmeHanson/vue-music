@@ -1,5 +1,5 @@
 import jsonp from "@/common/js/jsonp"
-import { commonParams, options,baseUrl } from './config'
+import { commonParams, options, baseUrl } from './config'
 import axios from "axios";
 
 export function getHotKey() {
