@@ -96,7 +96,9 @@ export default {
       this.page++;
       search(this.query, this.page, this.showSinger).then(res => {
         if (res.code === ERR_OK) {
-          this.suggestList = this.suggestList.concat(this._getResult(res.data));
+          this._getResult(res.data).then(songs => {
+            this.suggestList = this.suggestList.concat(songs);
+          })
           this._checkMore(res.data);
         }
       });
