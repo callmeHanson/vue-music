@@ -4,7 +4,7 @@ import axios from 'axios'
 import { ERR_OK, baseUrl } from 'api/config'
 
 // const debug = process.env.NODE_ENV !== 'production'
-const debug = true
+// const debug = true
 
 export function getLyric(mid) {
   const url = baseUrl + 'api/lyric'
