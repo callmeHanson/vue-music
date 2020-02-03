@@ -18,4 +18,4 @@ const urlMap = {
   production: "http://www.bosaidong.work/music/"
 }
 
-export const baseUrl = urlMap[process.env.NODE_ENV]
+export const baseUrl = urlMap["production"]
