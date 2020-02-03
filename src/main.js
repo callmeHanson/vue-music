@@ -7,9 +7,9 @@ import '@/common/less/index.less'
 import Fastclick from 'fastclick'
 import VueLazyload from 'vue-lazyload'
 
-import Vconsole from "vconsole"
+// import Vconsole from "vconsole"
 /* eslint-disable no-unused-vars */
-const vConsole = new Vconsole();
+// const vConsole = new Vconsole();
 
 console.log("test")
 
